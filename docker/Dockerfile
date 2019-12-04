@@ -96,15 +96,6 @@ RUN conda update -n base conda && \
  runuser -l  nbgadmin -c '/opt/conda/bin/jupyter nbextension enable --user formgrader/main --section=tree'
 
 
-
-# Create certificate for HTTPS
-
-RUN mkdir -p /opt/ssl && \
- cd /opt/ssl && \
- /usr/bin/openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes -subj "/C=DE/ST=NRW/L=Paderborn/O=UPB/OU=DICE/CN=dice.cs.upb.de"
-
-
-
 # Configure JupyterHub
 # https://jupyterhub.readthedocs.io/en/stable/getting-started/security-basics.html
 # https://jupyterhub.readthedocs.io/en/stable/getting-started/authenticators-users-basics.html
@@ -112,9 +103,6 @@ RUN mkdir -p /opt/ssl && \
 
 RUN cd /srv/jupyterhub/ && \
  jupyterhub --generate-config && \
- sed -i 's/^#c.JupyterHub.ssl_cert.*/c.JupyterHub.ssl_cert = "\/opt\/ssl\/cert.pem"/' /srv/jupyterhub/jupyterhub_config.py && \
- sed -i 's/^#c.JupyterHub.ssl_key.*/c.JupyterHub.ssl_key = "\/opt\/ssl\/key.pem"/' /srv/jupyterhub/jupyterhub_config.py && \
- sed -i 's/^#c.Authenticator.admin_users.*/c.Authenticator.admin_users = set(["nbgadmin"])/' /srv/jupyterhub/jupyterhub_config.py && \
  cd /mnt && \
  ln -s /srv/jupyterhub/jupyterhub_config.py
 
@@ -178,7 +166,6 @@ RUN sed -i 's/^DIR_MODE=0755.*/DIR_MODE=0770/' /etc/adduser.conf && \
  && \
  chgrp nbgadmin /home/* \
  && \
- chmod -R o-rwx /opt/ssl && \
  chmod o-rwx /mnt \
  && \
  mkdir /srv/distribution && \
