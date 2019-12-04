@@ -1,0 +1,56 @@
+version: "3.3"
+
+services:
+
+  traefik:
+    image: "traefik:latest"
+    container_name: "traefik"
+    command:
+      #- "--log.level=DEBUG"
+      # Uncomment to allow insecure access to the Traefik API
+      #- "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesResolvers.letsencrypt.acme.email=<YOUR EMAIL HERE>"
+      - "--certificatesResolvers.letsencrypt.acme.storage=/volume/acme.json"
+      - "--certificatesResolvers.letsencrypt.acme.httpChallenge=true"
+      - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=web"
+      # Uncomment this to use the Let's Encrypt Staging Server
+      #- "--certificatesResolvers.letsencrypt.acme.caServer=https://acme-staging-v02.api.letsencrypt.org/directory"
+    ports:
+      - "80:80"
+      # Uncomment this to map the traefik endpoint port on the host
+      #- "8080:8080"
+      - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - "traefik-volume:/volume"
+
+  nbgjava:
+    build: .
+    image: nbgjava:latest
+    container_name: "nbgjava"
+    labels:
+      - "traefik.enable=true"
+
+      # Http Entrypoint definition
+      - "traefik.http.routers.nbgjava-web.rule=Host(`<YOUR DOMAIN HERE>`)"
+      - "traefik.http.routers.nbgjava-web.entrypoints=web"
+
+      # Redirect to https
+      - "traefik.http.routers.nbgjava-web.middlewares=nbgjava-redirect"
+      - "traefik.http.middlewares.nbgjava-redirect.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.nbgjava-redirect.redirectscheme.permanent=true"
+
+      # Https Entrypoint definition
+      - "traefik.http.routers.nbgjava-websecure.rule=Host(`<YOUR DOMAIN HERE>`)"
+      - "traefik.http.routers.nbgjava-websecure.entrypoints=websecure"
+      - "traefik.http.routers.nbgjava-websecure.tls=true"
+      - "traefik.http.routers.nbgjava-websecure.tls.certresolver=letsencrypt"
+    volumes:
+      - "/mnt/nbgjava:/home/nbgadmin"
+
+volumes:
+  traefik-volume:
