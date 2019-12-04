@@ -1,10 +1,12 @@
 # nbgraderutils
 
 ## Files
-- `1-build-image.sh` and `Dockerfile`  
-  Shell script and commands to build and assemble docker image
-- `2-run-container.sh`  
-  Shell script to build and run a docker container based on the docker image
+- `Dockerfile`  
+  Description how to build the docker image
+- `docker-compose.yml`  
+  Description how to deploy the build image  
+  Replace `<YOUR EMAIL HERE>` with your EMail address and `<YOUR DOMAIN HERE>` with your domain name.  
+  These values are needed for the certificate generation
 
 ## Info
 
