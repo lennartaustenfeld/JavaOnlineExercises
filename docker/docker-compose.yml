@@ -13,7 +13,7 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--certificatesResolvers.letsencrypt.acme.email=<YOUR EMAIL HERE>"
+      - "--certificatesResolvers.letsencrypt.acme.email=${ACME_EMAIL}"
       - "--certificatesResolvers.letsencrypt.acme.storage=/volume/acme.json"
       - "--certificatesResolvers.letsencrypt.acme.httpChallenge=true"
       - "--certificatesResolvers.letsencrypt.acme.httpChallenge.entryPoint=web"
@@ -36,7 +36,7 @@ services:
       - "traefik.enable=true"
 
       # Http Entrypoint definition
-      - "traefik.http.routers.nbgjava-web.rule=Host(`<YOUR DOMAIN HERE>`)"
+      - "traefik.http.routers.nbgjava-web.rule=Host(`${JUPYTERHUB_DOMAIN}`)"
       - "traefik.http.routers.nbgjava-web.entrypoints=web"
 
       # Redirect to https
@@ -45,7 +45,7 @@ services:
       - "traefik.http.middlewares.nbgjava-redirect.redirectscheme.permanent=true"
 
       # Https Entrypoint definition
-      - "traefik.http.routers.nbgjava-websecure.rule=Host(`<YOUR DOMAIN HERE>`)"
+      - "traefik.http.routers.nbgjava-websecure.rule=Host(`${JUPYTERHUB_DOMAIN}`)"
       - "traefik.http.routers.nbgjava-websecure.entrypoints=websecure"
       - "traefik.http.routers.nbgjava-websecure.tls=true"
       - "traefik.http.routers.nbgjava-websecure.tls.certresolver=letsencrypt"
